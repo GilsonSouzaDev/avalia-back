@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -27,9 +29,16 @@ public class Usuario {
 
     private String senha;
 
-    private List<Disciplina> disciplina;
+    @ManyToMany
+    @JoinTable(
+            name = "usuario_disciplina",
+            joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "disciplina_id")
+    )
+    private Set<Disciplina> disciplinas = new HashSet<>();
 
-    private List<Pergunta> pergunta;
+    @OneToMany(mappedBy = "usuario")
+    private Set<Pergunta> perguntas = new HashSet<>();
 
     private Boolean coordenador;
 

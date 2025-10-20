@@ -22,10 +22,11 @@ public class Pergunta {
 
     private String conteudo;
 
-    @OneToOne
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
-    @OneToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "disciplina_id")
     private Disciplina disciplina;
 

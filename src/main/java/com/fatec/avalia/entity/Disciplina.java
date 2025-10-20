@@ -1,13 +1,16 @@
 package com.fatec.avalia.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -24,7 +27,9 @@ public class Disciplina {
 
     private String nome;
 
-    private List<Usuario> usuarios;
+    @ManyToMany(mappedBy = "disciplinas")
+    private Set<Usuario> usuarios = new HashSet<>();
 
-    private List<Pergunta> perguntas;
+    @OneToMany(mappedBy = "disciplina")
+    private Set<Pergunta> perguntas = new HashSet<>();
 }
