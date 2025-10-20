@@ -10,4 +10,5 @@ public class AvaliaApplication {
 		SpringApplication.run(AvaliaApplication.class, args);
 	}
 
+
 }
