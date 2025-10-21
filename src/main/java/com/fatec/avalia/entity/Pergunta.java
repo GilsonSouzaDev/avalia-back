@@ -1,34 +1,38 @@
 package com.fatec.avalia.entity;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-
+@AllArgsConstructor
 @Entity
-@Table(name = "Perguntas")
+@Table(name = "perguntas")
 public class Pergunta {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 500)
     private String conteudo;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "usuario_id")
-    private Usuario usuario;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "professor_id")
+    @JsonIgnoreProperties({"disciplinas", "perguntas"})
+    private Professor professor;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "disciplina_id")
+    @JsonIgnoreProperties({"professores", "perguntas"})
     private Disciplina disciplina;
 
+    @OneToMany(mappedBy = "pergunta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnoreProperties("pergunta")
+    private List<Alternativa> alternativas;
 
 }

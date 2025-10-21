@@ -1,5 +1,6 @@
 package com.fatec.avalia.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -16,8 +16,8 @@ import java.util.Set;
 @NoArgsConstructor
 
 @Entity
-@Table(name = "usuarios")
-public class Usuario {
+@Table(name = "professores")
+public class Professor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,13 +31,15 @@ public class Usuario {
 
     @ManyToMany
     @JoinTable(
-            name = "usuario_disciplina",
-            joinColumns = @JoinColumn(name = "usuario_id"),
+            name = "professor_disciplina",
+            joinColumns = @JoinColumn(name = "professor_id"),
             inverseJoinColumns = @JoinColumn(name = "disciplina_id")
     )
+    @JsonIgnoreProperties("professores")
     private Set<Disciplina> disciplinas = new HashSet<>();
 
-    @OneToMany(mappedBy = "usuario")
+    @OneToMany(mappedBy = "professor")
+    @JsonIgnoreProperties("professor")
     private Set<Pergunta> perguntas = new HashSet<>();
 
     private Boolean coordenador;
