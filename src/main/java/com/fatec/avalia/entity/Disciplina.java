@@ -17,7 +17,7 @@ import java.util.Set;
 @NoArgsConstructor
 
 @Entity
-@Table(name = "Disciplinas")
+@Table(name = "disciplinas")
 public class Disciplina {
 
     @Id
@@ -27,10 +27,12 @@ public class Disciplina {
     private String nome;
 
     @ManyToMany(mappedBy = "disciplinas")
-    @JsonIgnoreProperties("disciplinas") // 👈 evita recursão inversa
+    @JsonIgnoreProperties("disciplinas") // evita recursão inversa
     private Set<Professor> professores = new HashSet<>();
 
     @OneToMany(mappedBy = "disciplina")
     @JsonIgnoreProperties("disciplina")
     private Set<Pergunta> perguntas = new HashSet<>();
+
+    private String cor;
 }
