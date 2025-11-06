@@ -1,6 +1,7 @@
 package com.fatec.avalia.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fatec.avalia.enums.PerfilProfessor;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,12 +23,15 @@ public class Professor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String nome;
 
+    @Column(unique = true, nullable = false)
     private String email;
-
     private String senha;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PerfilProfessor perfilProfessor;
 
     @ManyToMany
     @JoinTable(
@@ -35,14 +39,13 @@ public class Professor {
             joinColumns = @JoinColumn(name = "professor_id"),
             inverseJoinColumns = @JoinColumn(name = "disciplina_id")
     )
+
     @JsonIgnoreProperties("professores")
     private Set<Disciplina> disciplinas = new HashSet<>();
+
 
     @OneToMany(mappedBy = "professor")
     @JsonIgnoreProperties("professor")
     private Set<Pergunta> perguntas = new HashSet<>();
-
-    private Boolean coordenador;
-
 
 }
