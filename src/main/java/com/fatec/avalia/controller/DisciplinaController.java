@@ -1,7 +1,9 @@
 package com.fatec.avalia.controller;
 
+import com.fatec.avalia.dto.DisciplinaDTO;
 import com.fatec.avalia.entity.Disciplina;
 import com.fatec.avalia.service.DisciplinaService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,25 +12,38 @@ import java.util.List;
 @RequestMapping("/api/disciplinas")
 public class DisciplinaController {
 
-    private final DisciplinaService service;
+    private final DisciplinaService disciplinaService;
 
-    public DisciplinaController(DisciplinaService service) {
-        this.service = service;
+    public DisciplinaController(DisciplinaService disciplinaService) {
+        this.disciplinaService = disciplinaService;
     }
 
     @GetMapping
-    public List<Disciplina> listar() {
-        return service.listarTodas();
+    public ResponseEntity<List<DisciplinaDTO>> listarTodos() {
+        return ResponseEntity.ok(disciplinaService.listarTodos());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DisciplinaDTO> buscarDisciplinaPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(disciplinaService.buscarPorId(id));
     }
 
     @PostMapping
-    public Disciplina criar(@RequestBody Disciplina disciplina) {
-        return service.salvar(disciplina);
+    public ResponseEntity<DisciplinaDTO> salvar(@RequestBody DisciplinaDTO disciplinaDTO) {
+        return ResponseEntity.ok(disciplinaService.salvar(disciplinaDTO));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DisciplinaDTO> atualizar(@PathVariable Long id, @RequestBody DisciplinaDTO disciplinaDTO) {
+        return ResponseEntity.ok(disciplinaService.atualizar(id, disciplinaDTO));
     }
 
     @DeleteMapping("/{id}")
-    public void deletar(@PathVariable Long id) {
-        service.excluir(id);
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        disciplinaService.excluir(id);
+        return ResponseEntity.noContent().build();
     }
+
+
 }
 
