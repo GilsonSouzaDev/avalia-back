@@ -21,12 +21,12 @@ public class Pergunta {
     @Column(nullable = false, length = 500)
     private String conteudo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "professor_id")
     @JsonIgnoreProperties({"disciplinas", "perguntas"})
     private Professor professor;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "disciplina_id")
     @JsonIgnoreProperties({"professores", "perguntas"})
     private Disciplina disciplina;
