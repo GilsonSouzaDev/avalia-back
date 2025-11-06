@@ -1,4 +1,6 @@
 package com.fatec.avalia.enums;
 
-public class PerfilProfessor {
+public enum PerfilProfessor {
+    PROFESSOR,
+    COORDENADOR
 }
