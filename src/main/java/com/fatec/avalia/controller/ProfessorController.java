@@ -1,7 +1,6 @@
 package com.fatec.avalia.controller;
 
 import com.fatec.avalia.dto.ProfessorDTO;
-import com.fatec.avalia.entity.Professor;
 import com.fatec.avalia.service.ProfessorService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
