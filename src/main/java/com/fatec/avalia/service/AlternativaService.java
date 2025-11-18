@@ -9,7 +9,6 @@ import java.util.List;
 @Service
 public class AlternativaService {
 
-    // Parei aqui
     private final AlternativaRepository alternativaRepository;
 
     public AlternativaService(AlternativaRepository alternativaRepository) {
