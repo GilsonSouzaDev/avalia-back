@@ -38,14 +38,15 @@ public class Professor {
             name = "professor_disciplina",
             joinColumns = @JoinColumn(name = "professor_id"),
             inverseJoinColumns = @JoinColumn(name = "disciplina_id")
+
     )
 
     @JsonIgnoreProperties("professores")
     private Set<Disciplina> disciplinas = new HashSet<>();
 
-
+    /*
     @OneToMany(mappedBy = "professor")
     @JsonIgnoreProperties("professor")
     private Set<Pergunta> perguntas = new HashSet<>();
-
+    */
 }
