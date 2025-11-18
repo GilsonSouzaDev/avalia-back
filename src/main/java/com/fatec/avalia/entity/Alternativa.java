@@ -19,9 +19,11 @@ public class Alternativa {
     @Column(nullable = false, length = 255)
     private String texto;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @Column(nullable = false)
+    private boolean correta;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pergunta_id", nullable = false)
-    @JsonIgnoreProperties("alternativas")
     private Pergunta pergunta;
 
 }
