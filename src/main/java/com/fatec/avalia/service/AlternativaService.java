@@ -9,22 +9,25 @@ import java.util.List;
 @Service
 public class AlternativaService {
 
-    private final AlternativaRepository repository;
+    // Parei aqui
+    private final AlternativaRepository alternativaRepository;
 
-    public AlternativaService(AlternativaRepository repository) {
-        this.repository = repository;
+    public AlternativaService(AlternativaRepository alternativaRepository) {
+
+        this.alternativaRepository = alternativaRepository;
     }
 
     public List<Alternativa> listarTodas() {
-        return repository.findAll();
+
+        return alternativaRepository.findAll();
     }
 
     public Alternativa salvar(Alternativa alternativa) {
-        return repository.save(alternativa);
+        return alternativaRepository.save(alternativa);
     }
 
     public void excluir(Long id) {
-        repository.deleteById(id);
+        alternativaRepository.deleteById(id);
     }
 }
 
