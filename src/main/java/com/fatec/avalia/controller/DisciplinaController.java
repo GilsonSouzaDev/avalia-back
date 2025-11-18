@@ -1,8 +1,10 @@
 package com.fatec.avalia.controller;
 
-import com.fatec.avalia.dto.DisciplinaDTO;
-import com.fatec.avalia.entity.Disciplina;
+import com.fatec.avalia.dto.disciplina.AtualizarCadastroDisciplinaDTO;
+import com.fatec.avalia.dto.disciplina.CadastrarDisciplinaDTO;
+import com.fatec.avalia.dto.disciplina.ListarDisciplinaDTO;
 import com.fatec.avalia.service.DisciplinaService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,32 +20,37 @@ public class DisciplinaController {
         this.disciplinaService = disciplinaService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<DisciplinaDTO>> listarTodos() {
-        return ResponseEntity.ok(disciplinaService.listarTodos());
+    @PostMapping
+    public ResponseEntity<ListarDisciplinaDTO> cadastrarDisciplina(@RequestBody @Valid CadastrarDisciplinaDTO dados) {
+        return ResponseEntity.ok(disciplinaService.cadastrarDisciplina(dados));
     }
+
+    @GetMapping
+    public ResponseEntity<List<ListarDisciplinaDTO>> listarTodasAsDisciplinas() {
+        return ResponseEntity.ok(disciplinaService.listarTodasAsDisciplinas());
+    }
+
+    @GetMapping("/buscar")
+    public List<ListarDisciplinaDTO> buscarDisciplinaPeloNome(@RequestParam String nome) {
+        return disciplinaService.buscarDisciplinaPeloNome(nome);
+    }
+
 
     @GetMapping("/{id}")
-    public ResponseEntity<DisciplinaDTO> buscarDisciplinaPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(disciplinaService.buscarPorId(id));
-    }
-
-    @PostMapping
-    public ResponseEntity<DisciplinaDTO> salvar(@RequestBody DisciplinaDTO disciplinaDTO) {
-        return ResponseEntity.ok(disciplinaService.salvar(disciplinaDTO));
+    public ResponseEntity<ListarDisciplinaDTO> buscarDisciplinaPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(disciplinaService.buscarDisciplinaPorId(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DisciplinaDTO> atualizar(@PathVariable Long id, @RequestBody DisciplinaDTO disciplinaDTO) {
-        return ResponseEntity.ok(disciplinaService.atualizar(id, disciplinaDTO));
+    public ResponseEntity<ListarDisciplinaDTO> atualizarDisciplina(@PathVariable Long id, @RequestBody AtualizarCadastroDisciplinaDTO dados) {
+        return ResponseEntity.ok(disciplinaService.atualizarDisciplina(id, dados));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        disciplinaService.excluir(id);
+        disciplinaService.excluirDisciplina(id);
         return ResponseEntity.noContent().build();
     }
-
 
 }
 
