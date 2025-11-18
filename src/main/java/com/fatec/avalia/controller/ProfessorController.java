@@ -19,6 +19,11 @@ public class ProfessorController {
         this.professorService = professorService;
     }
 
+    @PostMapping
+    public ResponseEntity<ProfessorDTO> salvar(@RequestBody ProfessorDTO professorDTO) {
+        return ResponseEntity.ok(professorService.salvar(professorDTO));
+    }
+
     @GetMapping
     public ResponseEntity<List<ProfessorDTO>> listarTodos() {
         return ResponseEntity.ok(professorService.listarTodos());
@@ -27,11 +32,6 @@ public class ProfessorController {
     @GetMapping("/{id}")
     public ResponseEntity<ProfessorDTO> buscarProfessorPorId (@PathVariable Long id) {
         return ResponseEntity.ok(professorService.buscarPorId(id));
-    }
-
-    @PostMapping
-    public ResponseEntity<ProfessorDTO> salvar(@RequestBody ProfessorDTO professorDTO) {
-        return ResponseEntity.ok(professorService.salvar(professorDTO));
     }
 
     @PutMapping("/{id}")
