@@ -1,51 +1,68 @@
 package com.fatec.avalia.controller;
 
-import com.fatec.avalia.dto.ProfessorDTO;
-import com.fatec.avalia.entity.Professor;
+import com.fatec.avalia.dto.login.EsqueciSenhaDTO;
+import com.fatec.avalia.dto.login.LoginDTO;
+import com.fatec.avalia.dto.professor.ProfessorRequestDTO;
+import com.fatec.avalia.dto.professor.ProfessorResponseDTO;
+import com.fatec.avalia.dto.professor.ProfessorUpdateDTO;
 import com.fatec.avalia.service.ProfessorService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/professores")
+@CrossOrigin(origins = "*")
 public class ProfessorController {
 
-    private final ProfessorService professorService;
+    private final ProfessorService service;
 
-    public ProfessorController(ProfessorService professorService) {
-        this.professorService = professorService;
+    public ProfessorController(ProfessorService service) {
+        this.service = service;
     }
 
+    // --- AUTENTICAÇÃO ---
+
+    @PostMapping("/login")
+    public ResponseEntity<ProfessorResponseDTO> login(@RequestBody @Valid LoginDTO loginData) {
+        ProfessorResponseDTO professorLogado = service.autenticar(loginData.getEmail(), loginData.getSenha());
+        return ResponseEntity.ok(professorLogado);
+    }
+
+    @PutMapping("/recuperar-senha")
+    public ResponseEntity<Void> redefinirSenha(@RequestBody @Valid EsqueciSenhaDTO dados) {
+        service.redefinirSenha(dados.getEmail(), dados.getNovaSenha());
+        return ResponseEntity.noContent().build();
+    }
+
+    // --- CRUD ---
+
     @PostMapping
-    public ResponseEntity<ProfessorDTO> salvar(@RequestBody ProfessorDTO professorDTO) {
-        return ResponseEntity.ok(professorService.salvar(professorDTO));
+    public ResponseEntity<ProfessorResponseDTO> cadastrar(@RequestBody @Valid ProfessorRequestDTO dto) {
+        ProfessorResponseDTO novoProfessor = service.salvar(dto);
+        return ResponseEntity.ok(novoProfessor);
     }
 
     @GetMapping
-    public ResponseEntity<List<ProfessorDTO>> listarTodos() {
-        return ResponseEntity.ok(professorService.listarTodos());
+    public ResponseEntity<List<ProfessorResponseDTO>> listarTodos() {
+        return ResponseEntity.ok(service.listarTodos());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProfessorDTO> buscarProfessorPorId (@PathVariable Long id) {
-        return ResponseEntity.ok(professorService.buscarPorId(id));
+    public ResponseEntity<ProfessorResponseDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(service.buscarPorId(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProfessorDTO> atualizar(@PathVariable Long id, @RequestBody ProfessorDTO professorDTO) {
-        ProfessorDTO atualizado = professorService.atualizar(id, professorDTO);
-        return ResponseEntity.ok(atualizado);
+    public ResponseEntity<ProfessorResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid ProfessorUpdateDTO dto) {
+        return ResponseEntity.ok(service.atualizar(id, dto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        professorService.excluir(id);
+        service.excluir(id);
         return ResponseEntity.noContent().build();
     }
-
-
 }
-

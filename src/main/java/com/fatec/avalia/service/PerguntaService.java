@@ -1,161 +1,130 @@
 package com.fatec.avalia.service;
 
-import com.fatec.avalia.dto.alternativa.AlternativaCadastradaDTO;
-import com.fatec.avalia.dto.pergunta.CadastrarPerguntaDTO;
-import com.fatec.avalia.dto.pergunta.EditarPerguntaDTO;
-import com.fatec.avalia.dto.pergunta.ListarPerguntaDTO;
+import com.fatec.avalia.dto.alternativa.AlternativaResponseDTO;
+import com.fatec.avalia.dto.disciplina.DisciplinaSimplesDTO;
+import com.fatec.avalia.dto.alternativa.AlternativaTextoDTO;
+import com.fatec.avalia.dto.pergunta.PerguntaRequestDTO;
+import com.fatec.avalia.dto.pergunta.PerguntaResponseDTO;
 import com.fatec.avalia.entity.Alternativa;
 import com.fatec.avalia.entity.Disciplina;
 import com.fatec.avalia.entity.Pergunta;
-import com.fatec.avalia.entity.Professor;
-import com.fatec.avalia.repository.AlternativaRepository;
 import com.fatec.avalia.repository.DisciplinaRepository;
 import com.fatec.avalia.repository.PerguntaRepository;
-import com.fatec.avalia.repository.ProfessorRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class PerguntaService {
 
     private final PerguntaRepository perguntaRepository;
-    private final ProfessorRepository professorRepository;
     private final DisciplinaRepository disciplinaRepository;
-    private final AlternativaRepository alternativaRepository;
 
-    public PerguntaService (PerguntaRepository perguntaRepository, ProfessorRepository professorRepository, DisciplinaRepository disciplinaRepository, AlternativaRepository alternativaRepository) {
+    public PerguntaService(PerguntaRepository perguntaRepository, DisciplinaRepository disciplinaRepository) {
         this.perguntaRepository = perguntaRepository;
-        this.professorRepository = professorRepository;
         this.disciplinaRepository = disciplinaRepository;
-        this.alternativaRepository = alternativaRepository;
     }
 
-    public ListarPerguntaDTO cadastrarPergunta(CadastrarPerguntaDTO dadosPergunta) {
-        Professor professor = professorRepository.findById(dadosPergunta.getProfessorId())
-                .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
-
-        Disciplina disciplina = disciplinaRepository.findById(dadosPergunta.getDisciplinaId())
+    @Transactional
+    public PerguntaResponseDTO cadastrar(PerguntaRequestDTO dto) {
+        Disciplina disciplina = disciplinaRepository.findById(dto.getDisciplinaId())
                 .orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
 
         Pergunta pergunta = new Pergunta();
-        pergunta.setEnunciado(dadosPergunta.getEnunciado());
+        pergunta.setEnunciado(dto.getEnunciado());
+        pergunta.setCodigoProfessor(dto.getCodigoProfessor());
         pergunta.setDisciplina(disciplina);
-        pergunta.setCriadoPor(professor);
 
-        List<Alternativa> alternativas = dadosPergunta.getAlternativas()
-                .stream()
-                .map(alternativaDTO -> new Alternativa(
-                        null,
-                        alternativaDTO.getTexto(),
-                        alternativaDTO.isCorreta(),
-                        pergunta
-                ))
-                .collect(Collectors.toList());
+        if (dto.getAlternativas() != null) {
+            List<Alternativa> listaAlternativas = new ArrayList<>();
+            for (AlternativaTextoDTO altDto : dto.getAlternativas()) {
+                Alternativa alt = new Alternativa();
+                alt.setTexto(altDto.getTexto());
+                alt.setPergunta(pergunta);
+                listaAlternativas.add(alt);
+            }
+            pergunta.setAlternativas(listaAlternativas);
+        }
 
-        pergunta.setAlternativasParaCadastro(alternativas);
-
-        Pergunta perguntaSalva = perguntaRepository.save(pergunta);
-
-        return new ListarPerguntaDTO(perguntaSalva);
+        return toDTO(perguntaRepository.save(pergunta));
     }
 
-
-    public List<ListarPerguntaDTO> listarTodasAsPerguntas() {
-        List<Pergunta> perguntas = perguntaRepository.findAll();
-
-        return perguntas.stream()
-                .map(pergunta -> new ListarPerguntaDTO(pergunta))
+    public List<PerguntaResponseDTO> listarTodas() {
+        return perguntaRepository.findAll().stream()
+                .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    public ListarPerguntaDTO atualizarPergunta (Long id, EditarPerguntaDTO dadosPergunta) {
-
-        Professor professorEditor = professorRepository.findById(dadosPergunta.getProfessorId())
-                .orElseThrow(() -> new RuntimeException("Professor (editor) não encontrado."));
-
-        Pergunta pergunta = perguntaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pergunta não encontrada."));
-
-        Disciplina disciplina = disciplinaRepository.findById(dadosPergunta.getDisciplinaId())
-                .orElseThrow(() -> new RuntimeException("Disciplina não encontrada."));
-
-        pergunta.setEnunciado(dadosPergunta.getEnunciado());
-        pergunta.setDisciplina(disciplina);
-
-        sincronizarAlternativas(pergunta, dadosPergunta.getAlternativas());
-
-
-        Pergunta perguntaAtualizada = perguntaRepository.save(pergunta);
-
-        return new ListarPerguntaDTO(perguntaAtualizada);
+    public PerguntaResponseDTO buscarPorId(Long id) {
+        return perguntaRepository.findById(id)
+                .map(this::toDTO)
+                .orElseThrow(() -> new RuntimeException("Pergunta não encontrada"));
     }
 
-    //Esse método será usado quando fizermos a parte do login
-    /*private void validarPermissao (Professor professor, Disciplina disciplina) {
+    public List<PerguntaResponseDTO> listarPorProfessor(Long codigoProfessor) {
+        return perguntaRepository.findByCodigoProfessor(codigoProfessor).stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
 
-        if (professor.getPerfilProfessor().equals("COORDENADOR")) {
-            return;
+    @Transactional
+    public PerguntaResponseDTO atualizar(Long id, PerguntaRequestDTO dto) {
+        Pergunta pergunta = perguntaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pergunta não encontrada"));
+
+        pergunta.setEnunciado(dto.getEnunciado());
+
+        if (!pergunta.getDisciplina().getId().equals(dto.getDisciplinaId())) {
+            Disciplina novaDisciplina = disciplinaRepository.findById(dto.getDisciplinaId())
+                    .orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
+            pergunta.setDisciplina(novaDisciplina);
         }
 
-        boolean lecionaEssaMateria = professor.getDisciplinas()
-                .stream()
-                .anyMatch(disciplinaDTO -> disciplinaDTO.getId().equals(disciplina.getId()));
-
-        if (lecionaEssaMateria) {
-            return;
-        }
-
-        throw new RuntimeException("Permissão negada. Você não é coordenador ou não leciona esta disciplina.");
-    }*/
-
-    private void sincronizarAlternativas(Pergunta pergunta, List<AlternativaCadastradaDTO> dtos) {
-
-        Map<Long, Alternativa> mapaAntigas = pergunta.getAlternativas().stream()
-                .collect(Collectors.toMap(Alternativa::getId, Function.identity()));
-
-        List<Alternativa> listaViva = pergunta.getAlternativas();
-
-        Set<Long> idsProcessados = new HashSet<>();
-
-        for (AlternativaCadastradaDTO dto : dtos) {
-            if (dto.getId() == null) {
-                Alternativa nova = new Alternativa(null, dto.getTexto(), dto.isCorreta(), pergunta);
-                listaViva.add(nova);
-            } else {
-                Alternativa existente = mapaAntigas.get(dto.getId());
-                if (existente != null) {
-                    existente.setTexto(dto.getTexto());
-                    existente.setCorreta(dto.isCorreta());
-                    idsProcessados.add(existente.getId());
-                }
+        // Atualização de alternativas (estratégia: remove tudo e recria)
+        // Graças ao orphanRemoval=true na Entidade, isso limpa o banco corretamente
+        if (dto.getAlternativas() != null) {
+            pergunta.getAlternativas().clear();
+            for (AlternativaTextoDTO altDto : dto.getAlternativas()) {
+                Alternativa alt = new Alternativa();
+                alt.setTexto(altDto.getTexto());
+                alt.setPergunta(pergunta);
+                pergunta.getAlternativas().add(alt);
             }
         }
 
-        List<Alternativa> paraRemover = new ArrayList<>();
-        for (Alternativa antiga : mapaAntigas.values()) {
-            if (!idsProcessados.contains(antiga.getId())) {
-                paraRemover.add(antiga);
-            }
+        return toDTO(perguntaRepository.save(pergunta));
+    }
+
+    public void excluir(Long id) {
+        if (!perguntaRepository.existsById(id)) {
+            throw new RuntimeException("Pergunta não encontrada");
+        }
+        perguntaRepository.deleteById(id);
+    }
+
+    private PerguntaResponseDTO toDTO(Pergunta entity) {
+        PerguntaResponseDTO dto = new PerguntaResponseDTO();
+        dto.setId(entity.getId());
+        dto.setEnunciado(entity.getEnunciado());
+        dto.setCodigoProfessor(entity.getCodigoProfessor());
+
+        if (entity.getDisciplina() != null) {
+            dto.setDisciplina(new DisciplinaSimplesDTO(
+                    entity.getDisciplina().getId(),
+                    entity.getDisciplina().getNome(),
+                    entity.getDisciplina().getCor()
+            ));
         }
 
-        listaViva.removeAll(paraRemover);
-    }
-
-/*
-    public Pergunta buscarPorId(Long id) {
-
-    }
-*/
-    public void excluirPergunta(Long id) {
-
-        Pergunta pergunta = perguntaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pergunta não encontrada."));
-
-        perguntaRepository.delete(pergunta);
-
+        if (entity.getAlternativas() != null) {
+            List<AlternativaResponseDTO> alts = entity.getAlternativas().stream()
+                    .map(a -> new AlternativaResponseDTO(a.getId(), a.getTexto(), entity.getId()))
+                    .collect(Collectors.toList());
+            dto.setAlternativas(alts);
+        }
+        return dto;
     }
 }
-

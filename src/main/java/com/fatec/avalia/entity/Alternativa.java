@@ -19,9 +19,6 @@ public class Alternativa {
     @Column(nullable = false, length = 255)
     private String texto;
 
-    @Column(nullable = false)
-    private boolean correta;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pergunta_id", nullable = false)
     private Pergunta pergunta;

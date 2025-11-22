@@ -22,6 +22,9 @@ public class Pergunta {
     @Column(nullable = false, length = 500)
     private String enunciado;
 
+    @Column(nullable = false, length = 500)
+    private Long codigoProfessor;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "professor_id")
     //@JsonIgnoreProperties({"disciplinas", "perguntas"})

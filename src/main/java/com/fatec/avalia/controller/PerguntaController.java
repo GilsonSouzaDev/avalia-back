@@ -1,9 +1,7 @@
 package com.fatec.avalia.controller;
 
-import com.fatec.avalia.dto.pergunta.CadastrarPerguntaDTO;
-import com.fatec.avalia.dto.pergunta.EditarPerguntaDTO;
-import com.fatec.avalia.dto.pergunta.ListarPerguntaDTO;
-import com.fatec.avalia.entity.Pergunta;
+import com.fatec.avalia.dto.pergunta.PerguntaRequestDTO;
+import com.fatec.avalia.dto.pergunta.PerguntaResponseDTO;
 import com.fatec.avalia.service.PerguntaService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -13,41 +11,43 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/perguntas")
+@CrossOrigin(origins = "*")
 public class PerguntaController {
 
-    private final PerguntaService perguntaService;
+    private final PerguntaService service;
 
-    public PerguntaController(PerguntaService perguntaService) {
-        this.perguntaService = perguntaService;
+    public PerguntaController(PerguntaService service) {
+        this.service = service;
     }
 
     @PostMapping
-    public ResponseEntity<ListarPerguntaDTO> cadastrarPergunta(@RequestBody @Valid CadastrarPerguntaDTO dadosPergunta) {
-
-        return ResponseEntity.ok(perguntaService.cadastrarPergunta(dadosPergunta));
+    public ResponseEntity<PerguntaResponseDTO> cadastrar(@RequestBody @Valid PerguntaRequestDTO dto) {
+        return ResponseEntity.ok(service.cadastrar(dto));
     }
 
-
     @GetMapping
-    public ResponseEntity<List<ListarPerguntaDTO>> listarTodasAsPerguntas() {
-        List<ListarPerguntaDTO> listaDePerguntas = perguntaService.listarTodasAsPerguntas();
+    public ResponseEntity<List<PerguntaResponseDTO>> listarTodas() {
+        return ResponseEntity.ok(service.listarTodas());
+    }
 
-        return ResponseEntity.ok(listaDePerguntas);
+    @GetMapping("/{id}")
+    public ResponseEntity<PerguntaResponseDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(service.buscarPorId(id));
+    }
+
+    @GetMapping("/professor/{codigoProfessor}")
+    public ResponseEntity<List<PerguntaResponseDTO>> listarPorProfessor(@PathVariable Long codigoProfessor) {
+        return ResponseEntity.ok(service.listarPorProfessor(codigoProfessor));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ListarPerguntaDTO> atualizarPergunta(@PathVariable Long id, @RequestBody @Valid EditarPerguntaDTO dadosPergunta) {
-        ListarPerguntaDTO perguntaAtualizada = perguntaService.atualizarPergunta(id, dadosPergunta);
-
-        return ResponseEntity.ok(perguntaAtualizada);
+    public ResponseEntity<PerguntaResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid PerguntaRequestDTO dto) {
+        return ResponseEntity.ok(service.atualizar(id, dto));
     }
 
-
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> excluirPergunta(@PathVariable Long id) {
-        perguntaService.excluirPergunta(id);
-
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        service.excluir(id);
         return ResponseEntity.noContent().build();
     }
 }
-

@@ -1,110 +1,88 @@
 package com.fatec.avalia.service;
 
-import com.fatec.avalia.dto.disciplina.AtualizarCadastroDisciplinaDTO;
-import com.fatec.avalia.dto.disciplina.CadastrarDisciplinaDTO;
-import com.fatec.avalia.dto.disciplina.ListarDisciplinaDTO;
+import com.fatec.avalia.dto.disciplina.DisciplinaRequestDTO;
+import com.fatec.avalia.dto.disciplina.DisciplinaResponseDTO;
 import com.fatec.avalia.entity.Disciplina;
 import com.fatec.avalia.repository.DisciplinaRepository;
-import com.fatec.avalia.repository.ProfessorRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 public class DisciplinaService {
 
     private final DisciplinaRepository disciplinaRepository;
-    private final ProfessorRepository professorRepository;
 
-
-    public DisciplinaService(DisciplinaRepository disciplinaRepository, ProfessorRepository professorRepository) {
+    public DisciplinaService(DisciplinaRepository disciplinaRepository) {
         this.disciplinaRepository = disciplinaRepository;
-        this.professorRepository = professorRepository;
     }
 
-    public ListarDisciplinaDTO cadastrarDisciplina(CadastrarDisciplinaDTO dados) {
-
-        Boolean existeEssaDisciplina = disciplinaRepository.findByNomeIgnoreCase(dados.getNome()).isPresent();
-
-        if (existeEssaDisciplina) {
-            throw new IllegalArgumentException("Já existe uma disciplina com esse nome cadastrado no sistema");
-        }
-
-        if (dados.getCor() == null || dados.getCor().isEmpty()) {
-            dados.setCor(gerarCor());
+    @Transactional
+    public DisciplinaResponseDTO cadastrar(DisciplinaRequestDTO dto) {
+        if (disciplinaRepository.existsByNomeIgnoreCase(dto.getNome())) {
+            throw new IllegalArgumentException("Já existe uma disciplina com este nome.");
         }
 
         Disciplina disciplina = new Disciplina();
-        disciplina.setNome(dados.getNome());
-        disciplina.setCor(dados.getCor().toLowerCase());
+        disciplina.setNome(dto.getNome());
+        disciplina.setCor(dto.getCor() == null || dto.getCor().isEmpty() ? gerarCorAleatoria() : dto.getCor());
 
-        disciplinaRepository.save(disciplina);
-        return new ListarDisciplinaDTO(disciplina);
+        return toDTO(disciplinaRepository.save(disciplina));
     }
 
-    // Método responsável por gerar cor para as matérias cadastradas sem cores
-    private String gerarCor() {
-        Random numeroAleatorio = new Random();
-        int r = numeroAleatorio.nextInt(256);
-        int g = numeroAleatorio.nextInt(256);
-        int b = numeroAleatorio.nextInt(256);
-        return String.format("#%02x%02x%02x", r, g, b);
+    public List<DisciplinaResponseDTO> listarTodas() {
+        return disciplinaRepository.findAll().stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 
+    public DisciplinaResponseDTO buscarPorId(Long id) {
+        return disciplinaRepository.findById(id)
+                .map(this::toDTO)
+                .orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
+    }
 
-    public ListarDisciplinaDTO buscarDisciplinaPorId(Long id) {
+    @Transactional
+    public DisciplinaResponseDTO atualizar(Long id, DisciplinaRequestDTO dto) {
         Disciplina disciplina = disciplinaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
 
-        return new ListarDisciplinaDTO(disciplina);
-    }
+        disciplina.setNome(dto.getNome());
 
-    public List<ListarDisciplinaDTO> listarTodasAsDisciplinas() {
-        return disciplinaRepository.findAll()
-                .stream()
-                .map(disciplina -> new ListarDisciplinaDTO(disciplina.getId(), disciplina.getNome(), disciplina.getCor()))
-                .toList();
-    }
-
-    public List<ListarDisciplinaDTO> buscarDisciplinaPeloNome(String nome) {
-        List<Disciplina> disciplinas = disciplinaRepository.findByNomeContainingIgnoreCase(nome);
-
-        if (disciplinas.isEmpty()) {
-            throw new IllegalArgumentException("Nenhuma disciplina encontrada com esse nome");
+        if (dto.getCor() != null && !dto.getCor().isEmpty()) {
+            disciplina.setCor(dto.getCor());
         }
 
-        return disciplinas.stream()
-                .map(ListarDisciplinaDTO::new)
-                .toList();
+        return toDTO(disciplinaRepository.save(disciplina));
     }
 
-    public ListarDisciplinaDTO atualizarDisciplina(Long id, AtualizarCadastroDisciplinaDTO dados) {
-        Disciplina disciplina = disciplinaRepository.findById(dados.getId())
-                .orElseThrow(() -> new RuntimeException("Disciplina não encontrada"));
-
-        if (dados.getNome() != null) {
-            disciplina.setNome(dados.getNome());
+    public void excluir(Long id) {
+        if (!disciplinaRepository.existsById(id)) {
+            throw new RuntimeException("Disciplina não encontrada");
         }
-
-        if (dados.getCor() != null) {
-            disciplina.setCor(dados.getCor());
-        }
-
-        disciplinaRepository.save(disciplina);
-
-        return new ListarDisciplinaDTO(disciplina);
-    }
-
-    public void excluirDisciplina(Long id) {
-
-        Disciplina disciplina = disciplinaRepository.findById(id)
-                        .orElseThrow(() -> new RuntimeException("Essa disciplina não foi encontrada"));
-
         disciplinaRepository.deleteById(id);
     }
 
-}
+    private String gerarCorAleatoria() {
+        Random random = new Random();
+        return String.format("#%06x", random.nextInt(0xffffff + 1));
+    }
 
+    private DisciplinaResponseDTO toDTO(Disciplina entity) {
+        DisciplinaResponseDTO dto = new DisciplinaResponseDTO();
+        dto.setId(entity.getId());
+        dto.setNome(entity.getNome());
+        dto.setCor(entity.getCor());
+
+        if (entity.getPerguntas() != null) {
+            List<Long> ids = entity.getPerguntas().stream()
+                    .map(p -> p.getId())
+                    .collect(Collectors.toList());
+            dto.setPerguntasIds(ids);
+        }
+        return dto;
+    }
+}

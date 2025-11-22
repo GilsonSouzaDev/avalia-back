@@ -14,4 +14,7 @@ public interface DisciplinaRepository extends JpaRepository<Disciplina, Long> {
 
     List<Disciplina> findByNomeContainingIgnoreCase(String nome);
 
+    // Novo: Facilita a validação no cadastro (economiza memória comparado ao findBy)
+    boolean existsByNomeIgnoreCase(String nome);
+
 }

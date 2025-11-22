@@ -23,13 +23,20 @@ public class Professor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, length = 100)
     private String nome;
+
+    @Column(nullable = false, length = 100)
+    private Long codigo;
 
     @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(nullable = false, length = 100)
     private String senha;
 
-    @Column(nullable = false)
+    @Column(name = "perfil_professor", nullable = false)
     @Enumerated(EnumType.STRING)
     private PerfilProfessor perfilProfessor;
 
@@ -43,6 +50,8 @@ public class Professor {
 
     @JsonIgnoreProperties("professores")
     private Set<Disciplina> disciplinas = new HashSet<>();
+
+
 
     /*
     @OneToMany(mappedBy = "professor")
