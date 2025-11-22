@@ -93,15 +93,14 @@ public class ProfessorService {
         Professor professor = professorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Professor não encontrado"));
 
-        // Atualiza dados básicos
         professor.setNome(dto.getNome());
         professor.setEmail(dto.getEmail());
         professor.setPerfilProfessor(dto.getPerfilProfessor());
-        // Se quiser permitir alterar senha e código no update, descomente:
-        professor.setSenha(dto.getSenha());
-        // professor.setCodigo(dto.getCodigo()); //nunca deve ser alterado
 
-        // Atualiza relacionamentos (Disciplinas)
+        if (dto.getSenha() != null && !dto.getSenha().trim().isEmpty()) {
+            professor.setSenha(dto.getSenha());
+        }
+
         if (dto.getDisciplinasIds() != null) {
             Set<Disciplina> disciplinas = new HashSet<>(disciplinaRepository.findAllById(dto.getDisciplinasIds()));
             professor.setDisciplinas(disciplinas);
