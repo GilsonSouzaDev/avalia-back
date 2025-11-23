@@ -4,6 +4,7 @@ import com.fatec.avalia.dto.disciplina.DisciplinaRequestDTO;
 import com.fatec.avalia.dto.disciplina.DisciplinaResponseDTO;
 import com.fatec.avalia.entity.Disciplina;
 import com.fatec.avalia.repository.DisciplinaRepository;
+import com.fatec.avalia.repository.PerguntaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +16,12 @@ import java.util.stream.Collectors;
 public class DisciplinaService {
 
     private final DisciplinaRepository disciplinaRepository;
+    private final PerguntaRepository perguntaRepository; // Injeção nova
 
-    public DisciplinaService(DisciplinaRepository disciplinaRepository) {
+    public DisciplinaService(DisciplinaRepository disciplinaRepository,
+                             PerguntaRepository perguntaRepository) {
         this.disciplinaRepository = disciplinaRepository;
+        this.perguntaRepository = perguntaRepository;
     }
 
     @Transactional
@@ -59,12 +63,21 @@ public class DisciplinaService {
         return toDTO(disciplinaRepository.save(disciplina));
     }
 
+    @Transactional
     public void excluir(Long id) {
         if (!disciplinaRepository.existsById(id)) {
             throw new RuntimeException("Disciplina não encontrada");
         }
+
+        // 1. Remove todas as perguntas vinculadas a esta disciplina
+        perguntaRepository.deleteByDisciplinaId(id);
+
+        // 2. Remove a disciplina
         disciplinaRepository.deleteById(id);
     }
+
+
+
 
     private String gerarCorAleatoria() {
         Random random = new Random();

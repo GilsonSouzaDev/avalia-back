@@ -13,4 +13,10 @@ public interface PerguntaRepository extends JpaRepository<Pergunta, Long> {
 
     List<Pergunta> findByDisciplinaId(Long disciplinaId);
 
+    void deleteByCodigoProfessor(Long codigoProfessor);
+
+    void deleteByDisciplinaId(Long disciplinaId);
+
+    void deleteByCodigoProfessorAndDisciplinaId(Long codigoProfessor, Long disciplinaId);
+
 }

@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AlternativaRequestDTO {
 
+
+    private Long id;
+
     @NotBlank(message = "O texto da alternativa é obrigatório")
     private String texto;
 
