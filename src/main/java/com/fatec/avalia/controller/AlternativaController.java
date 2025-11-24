@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/alternativas")
-@CrossOrigin(origins = "*")
 public class AlternativaController {
 
     private final AlternativaService service;

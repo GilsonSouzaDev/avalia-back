@@ -9,9 +9,15 @@ public class CorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**") // Aplica a todas as rotas
-                .allowedOrigins("http://localhost:4200") // Permite apenas o Angular
-                // .allowedOrigins("*") // Use "*" se quiser permitir qualquer origem (menos seguro)
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT");
+        registry.addMapping("/**")
+                .allowedOrigins(
+                        "http://localhost:4200",              // Angular local
+                        "https://avalialoop.live",           // Domínio principal
+                        "https://www.avalialoop.live",       // Domínio com www
+                        "https://avalia-alpha.vercel.app"    // SEU domínio da Vercel (confirme!)
+                )
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }
