@@ -15,9 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 public class ProfessorUpdateDTO {
 
-    @NotNull(message = "O código do professor é obrigatório")
-    private Long codigo;
-
     @NotBlank(message = "O nome é obrigatório")
     private String nome;
 

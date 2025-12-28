@@ -1,4 +1,4 @@
-package com.fatec.avalia; // Ajuste o pacote conforme sua estrutura
+package com.fatec.avalia;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -14,7 +14,8 @@ public class CorsConfig implements WebMvcConfigurer {
                         "http://localhost:4200",              // Angular local
                         "https://avalialoop.live",           // Domínio principal
                         "https://www.avalialoop.live",       // Domínio com www
-                        "https://avalia-alpha.vercel.app"    // SEU domínio da Vercel (confirme!)
+                        "https://avalialoop.vercel.app/",
+                        "https://avalialoop-1zhvak5io-gilson-c-souzas-projects.vercel.app/"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")

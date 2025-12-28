@@ -15,7 +15,6 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-
 @Entity
 @Table(name = "professores")
 public class Professor {
@@ -26,9 +25,6 @@ public class Professor {
 
     @Column(nullable = false, length = 100)
     private String nome;
-
-    @Column(nullable = false, length = 100)
-    private Long codigo;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -45,17 +41,13 @@ public class Professor {
             name = "professor_disciplina",
             joinColumns = @JoinColumn(name = "professor_id"),
             inverseJoinColumns = @JoinColumn(name = "disciplina_id")
-
     )
-
     @JsonIgnoreProperties("professores")
     private Set<Disciplina> disciplinas = new HashSet<>();
 
-
-
-    /*
-    @OneToMany(mappedBy = "professor")
+    // Relação direta agora mapeada pelo atributo 'professor' na classe Pergunta
+    @OneToMany(mappedBy = "professor", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("professor")
     private Set<Pergunta> perguntas = new HashSet<>();
-    */
+
 }

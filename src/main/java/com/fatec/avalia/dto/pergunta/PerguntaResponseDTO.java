@@ -15,9 +15,8 @@ public class PerguntaResponseDTO {
 
     private Long id;
     private String enunciado;
-    private Long codigoProfessor;
-
+    private Long professorId;
+    private String imagem;
     private DisciplinaSimplesDTO disciplina;
-
     private List<AlternativaResponseDTO> alternativas;
 }

@@ -4,8 +4,10 @@ import com.fatec.avalia.dto.pergunta.PerguntaRequestDTO;
 import com.fatec.avalia.dto.pergunta.PerguntaResponseDTO;
 import com.fatec.avalia.service.PerguntaService;
 import jakarta.validation.Valid;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,9 +21,21 @@ public class PerguntaController {
         this.service = service;
     }
 
-    @PostMapping
-    public ResponseEntity<PerguntaResponseDTO> cadastrar(@RequestBody @Valid PerguntaRequestDTO dto) {
-        return ResponseEntity.ok(service.cadastrar(dto));
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PerguntaResponseDTO> cadastrar(
+            @RequestPart("pergunta") @Valid PerguntaRequestDTO dto,
+            @RequestPart(value = "imagem", required = false) MultipartFile imagem) {
+
+        return ResponseEntity.ok(service.cadastrar(dto, imagem));
+    }
+
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PerguntaResponseDTO> atualizar(
+            @PathVariable Long id,
+            @RequestPart("pergunta") @Valid PerguntaRequestDTO dto,
+            @RequestPart(value = "imagem", required = false) MultipartFile imagem) {
+
+        return ResponseEntity.ok(service.atualizar(id, dto, imagem));
     }
 
     @GetMapping
@@ -34,14 +48,9 @@ public class PerguntaController {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
-    @GetMapping("/professor/{codigoProfessor}")
-    public ResponseEntity<List<PerguntaResponseDTO>> listarPorProfessor(@PathVariable Long codigoProfessor) {
-        return ResponseEntity.ok(service.listarPorProfessor(codigoProfessor));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<PerguntaResponseDTO> atualizar(@PathVariable Long id, @RequestBody @Valid PerguntaRequestDTO dto) {
-        return ResponseEntity.ok(service.atualizar(id, dto));
+    @GetMapping("/professor/{professorId}")
+    public ResponseEntity<List<PerguntaResponseDTO>> listarPorProfessor(@PathVariable Long professorId) {
+        return ResponseEntity.ok(service.listarPorProfessor(professorId));
     }
 
     @DeleteMapping("/{id}")

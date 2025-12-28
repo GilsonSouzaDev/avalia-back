@@ -1,6 +1,5 @@
 package com.fatec.avalia.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,8 +21,13 @@ public class Pergunta {
     @Column(nullable = false, length = 500)
     private String enunciado;
 
-    @Column(nullable = false, length = 500)
-    private Long codigoProfessor;
+    @Column(length = 255)
+    private String imagem;
+
+    // Nova relação direta com Professor
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "professor_id", nullable = false)
+    private Professor professor;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "disciplina_id")
@@ -34,10 +38,9 @@ public class Pergunta {
 
     public void setAlternativasParaCadastro(List<Alternativa> alternativas) {
         this.alternativas.clear();
-        // Adiciona as novas e define a relação bidirecional
         if (alternativas != null) {
             for (Alternativa alt : alternativas) {
-                alt.setPergunta(this); // Seta o "pai" na "filha"
+                alt.setPergunta(this);
                 this.alternativas.add(alt);
             }
         }

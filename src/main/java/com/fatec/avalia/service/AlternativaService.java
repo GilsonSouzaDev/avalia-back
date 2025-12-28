@@ -66,9 +66,11 @@ public class AlternativaService {
     }
 
     private AlternativaResponseDTO toDTO(Alternativa entity) {
+        // Corrigido: Agora passa os 4 parâmetros necessários para o construtor do DTO
         return new AlternativaResponseDTO(
                 entity.getId(),
                 entity.getTexto(),
+                entity.isCorreta(), // Incluído o campo booleano
                 entity.getPergunta().getId()
         );
     }

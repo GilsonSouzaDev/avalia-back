@@ -19,4 +19,6 @@ public class AlternativaRequestDTO {
 
     @NotNull(message = "O ID da pergunta é obrigatório para vincular a alternativa")
     private Long perguntaId;
+
+    private boolean correta;
 }

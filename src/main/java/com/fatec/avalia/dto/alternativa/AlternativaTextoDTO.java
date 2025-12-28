@@ -11,4 +11,6 @@ import lombok.NoArgsConstructor;
 public class AlternativaTextoDTO {
     @NotBlank(message = "O texto da alternativa não pode ser vazio")
     private String texto;
+
+    private boolean correta;
 }

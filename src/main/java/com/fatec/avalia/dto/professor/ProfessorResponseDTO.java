@@ -11,8 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProfessorResponseDTO {
-    private Long id;       // ID do banco (PK)
-    private Long codigo;   // Seu novo campo lógico
+    private Long id;
     private String nome;
     private String email;
     private PerfilProfessor perfilProfessor;

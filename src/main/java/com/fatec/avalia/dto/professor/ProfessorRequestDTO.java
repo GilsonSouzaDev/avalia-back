@@ -15,9 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 public class ProfessorRequestDTO {
 
-    @NotNull(message = "O código do professor é obrigatório")
-    private Long codigo; // Seu novo campo
-
     @NotBlank(message = "O nome é obrigatório")
     private String nome;
 

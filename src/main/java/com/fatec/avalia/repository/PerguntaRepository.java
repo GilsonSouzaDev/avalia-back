@@ -9,14 +9,9 @@ import java.util.List;
 @Repository
 public interface PerguntaRepository extends JpaRepository<Pergunta, Long> {
 
-    List<Pergunta> findByCodigoProfessor(Long codigoProfessor);
-
     List<Pergunta> findByDisciplinaId(Long disciplinaId);
-
-    void deleteByCodigoProfessor(Long codigoProfessor);
-
+    List<Pergunta> findByProfessorId(Long professorId);
     void deleteByDisciplinaId(Long disciplinaId);
-
-    void deleteByCodigoProfessorAndDisciplinaId(Long codigoProfessor, Long disciplinaId);
-
+    void deleteByProfessorIdAndDisciplinaId(Long professorId, Long disciplinaId);
+    void deleteByProfessorId(Long professorId);
 }
